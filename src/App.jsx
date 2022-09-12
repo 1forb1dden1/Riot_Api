@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-
 import axios from 'axios';
 import './App.css';
 
 //change to servers
-const options = [
+const servers = [
   { value: 'na1', label: 'NA' },
   { value: 'euw1', label: 'EUW' },
   { value: 'eun1', label: 'EUNE' },
@@ -19,7 +18,7 @@ const options = [
 ]
 
 //change to ranks
-const options2 = [
+const ranks = [
   { value: "bronze", label: "img/lolRanks/Emblem_Bronze.png" },
   { value: "silver", label: "img/lolRanks/Emblem_Silver.png" },
   { value: "gold", label: "img/lolRanks/Emblem_Gold.png" },
@@ -31,59 +30,53 @@ const options2 = [
 ]
 
 function App() {
-  const API_KEY ="RGAPI-f7f4e773-b6b9-4cb6-bf37-254975189d66";
+  const API_KEY ="RGAPI-4925a7d7-915b-44da-a4cb-17ee261e2294";
   const patch = "12.17.1";
   const [playerData, setPlayerData] = useState({});
   const [playerStats, setPlayerStats] = useState({});
   const [searchText, setSearchText] = useState("");
   const [serverName, setServerName] = useState("na1");
 
-  function searchForPlayer(event){
+  function searchForPlayer(){
     var ApiCallString = "https://" + serverName + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + searchText + "?api_key=" + API_KEY;
     axios.get(ApiCallString).then(function(response){
       setPlayerData(response.data);
-      //console.log(playerData);
+      console.log(response.data);
+      var ApiCallString2 = "https://" + serverName + ".api.riotgames.com/lol/league/v4/entries/by-summoner/" + response.data.id + "?api_key=" + API_KEY;
+      axios.get(ApiCallString2).then(function(response){
+        setPlayerStats(response.data);
+        console.log(response.data);
+      });
     }).catch (function (error){
       console.log(error);
+      setPlayerData({});
     });
   }
   
-  function searchForPlayerRank(event){
-    var ApiCallString = "https://" + serverName + ".api.riotgames.com/lol/league/v4/entries/by-summoner/" + playerData.id + "?api_key=" + API_KEY;
-    axios.get(ApiCallString).then(function(response){
-      setPlayerStats(response.data);
-      console.log(playerStats);
-    }).catch (function (error){
-      console.log(error);
-    });
-  }
-
-  function buttonPressHandler(event){
-    searchForPlayer(event);
-    searchForPlayerRank(event);
-  }
   return (
     <div className="App">
       <div className="container">
         <h5>League of Legends Player Searcher</h5>
 
         <select value={serverName} onChange={e => setServerName(e.target.value)}>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {servers.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
             </option>
           ))}
         </select>
 
         <input type="text" onChange={e => setSearchText(e.target.value)}></input>
-        <button onClick={e => buttonPressHandler(e)}>Search for Player</button>
+        <button onClick={e => searchForPlayer(e)}>Search for Player</button>
       </div>
-      {JSON.stringify(playerData) != '{}' && JSON.stringify(playerStats) != '{}' ?
+      {JSON.stringify(playerData) != '{}' && JSON.stringify(playerStats) != '{}'?
       <>
       <p>{playerData.name}</p>
       <img width="150" height="150" src={"https://ddragon.leagueoflegends.com/cdn/" + patch + "/img/profileicon/" + playerData.profileIconId + ".png"}></img>
       <p>Summoner Level {playerData.summonerLevel}</p>
-      <p>{playerStats[0].tier} {playerStats[0].rank} {playerStats[0].leaguePoints} {playerStats[0].wins}</p>
+      {playerStats[0] != undefined ? 
+      <> <p>{playerStats[0].tier} {playerStats[0].rank} {playerStats[0].leaguePoints} lp</p> </>
+      : <> <p>Unranked</p> </>}
       </> :
       <><p>No player data</p> 
       </>}
