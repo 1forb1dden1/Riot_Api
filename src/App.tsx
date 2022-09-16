@@ -1,43 +1,17 @@
 import React, { useState } from "react";
 import axios from 'axios';
+import {servers, ranks} from "./data"
 import './App.css';
 
-//change to servers
-const servers = [
-  { value: 'na1', label: 'NA' },
-  { value: 'euw1', label: 'EUW' },
-  { value: 'eun1', label: 'EUNE' },
-  { value: 'br1', label: 'BR' },
-  { value: 'jp1', label: 'JP' },
-  { value: 'kr', label: 'KR' },
-  { value: 'la1', label: 'LAN' },
-  { value: 'la2', label: 'LAS' },
-  { value: 'oc1', label: 'OCE' },
-  { value: 'tr1', label: 'TR' },
-  { value: 'ru', label: 'RU' },
-]
-
-//change to ranks
-const ranks = [
-  { value: "bronze", label: "img/lolRanks/Emblem_Bronze.png" },
-  { value: "silver", label: "img/lolRanks/Emblem_Silver.png" },
-  { value: "gold", label: "img/lolRanks/Emblem_Gold.png" },
-  { value: "platinum", label: "img/lolRanks/Emblem_Platinum.png" },
-  { value: "diamond", label: "img/lolRanks/Emblem_Diamond.png" },
-  { value: "master", label: "img/lolRanks/Emblem_Master.png" },
-  { value: "grandmaster", label: "img/lolRanks/Emblem_Grandmaster.png" },
-  { value: "challenger", label: "img/lolRanks/Emblem_Challenger.png" },
-]
-
 function App() {
-  const API_KEY ="RGAPI-4925a7d7-915b-44da-a4cb-17ee261e2294";
+  const API_KEY ="RGAPI-3fe92e43-bf2b-4082-95e7-c5c9fe5e2ab6";
   const patch = "12.17.1";
-  const [playerData, setPlayerData] = useState({});
-  const [playerStats, setPlayerStats] = useState({});
-  const [searchText, setSearchText] = useState("");
-  const [serverName, setServerName] = useState("na1");
+  const [playerData, setPlayerData] = useState<any>({});
+  const [playerStats, setPlayerStats] = useState<any>({});
+  const [searchText, setSearchText] = useState<string>("");
+  const [serverName, setServerName] = useState<string>("na1");
 
-  function searchForPlayer(){
+  function searchForPlayer(input : any) {
     var ApiCallString = "https://" + serverName + ".api.riotgames.com/lol/summoner/v4/summoners/by-name/" + searchText + "?api_key=" + API_KEY;
     axios.get(ApiCallString).then(function(response){
       setPlayerData(response.data);
@@ -56,7 +30,7 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-        <h5>League of Legends Player Searcher</h5>
+        <h3>League of Legends Player Searcher</h3>
 
         <select value={serverName} onChange={e => setServerName(e.target.value)}>
           {servers.map((s) => (
